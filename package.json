@@ -1,0 +1,53 @@
+{
+  "name": "inSilicoFragmentationBenchmark",
+  "version": "0.0.0",
+  "license": "MIT",
+  "description": "benchmark of the insilico fragmentation tool",
+  "keywords": [],
+  "author": "Ricardo",
+  "type": "module",
+  "exports": {
+    ".": "./lib/index.js"
+  },
+  "files": [
+    "lib",
+    "src"
+  ],
+  "scripts": {
+    "check-types": "tsc --noEmit",
+    "clean": "rimraf coverage lib",
+    "eslint": "eslint .",
+    "eslint-fix": "eslint . --fix",
+    "prepack": "npm run tsc",
+    "prettier": "prettier --check .",
+    "prettier-write": "prettier --write .",
+    "test": "npm run test-only && npm run check-types && npm run eslint && npm run prettier",
+    "test-only": "vitest run --coverage",
+    "tsc": "npm run clean && npm run tsc-build",
+    "tsc-build": "tsc --project tsconfig.build.json",
+    "challenge": "node -e \"import('./src/challenger.js').then(({ default: runChallenger }) => runChallenger({ testMode: false })).catch(err => { console.error(err); process.exit(1); });\""
+  },
+  "dependencies": {
+    "mass-fragmentation": "^1.11.10",
+    "ms-spectrum": "^3.9.2"
+  },
+  "devDependencies": {
+    "@types/node": "^25.2.0",
+    "@vitest/coverage-v8": "^4.0.18",
+    "@zakodium/tsconfig": "^1.0.2",
+    "eslint": "^9.39.2",
+    "eslint-config-cheminfo-typescript": "^21.1.0",
+    "prettier": "^3.8.1",
+    "rimraf": "^6.1.2",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.18"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cheminfo/inSilicoFragmentationBenchmark.git"
+  },
+  "bugs": {
+    "url": "https://github.com/cheminfo/inSilicoFragmentationBenchmark/issues"
+  },
+  "homepage": "https://github.com/cheminfo/inSilicoFragmentationBenchmark#readme"
+}
