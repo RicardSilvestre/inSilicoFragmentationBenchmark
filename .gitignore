@@ -120,3 +120,4 @@ dist
 lib
 # add src/data/ to gitignore
 src/data/
+src/results/

@@ -82,7 +82,7 @@ function computeSummary(allResults) {
 }
 
 function getConcurrency() {
-  const cpu = 4; //os.cpus()?.length || 2;
+  const cpu = os.cpus()?.length || 2;
   return Math.max(1, Math.floor(cpu / 2));
 }
 
