@@ -120,10 +120,7 @@ if (!isMainThread && workerData) {
   (async () => {
     try {
       ensureData();
-      const fragmentationChallengerModule =
-        await import('./utils/fragmentationChallenger.js');
-      const fragmentationChallengerFn = fragmentationChallengerModule.default;
-      const result = await fragmentationChallengerFn(workerData);
+      const result = await fragmentationChallenger(workerData);
       parentPort.postMessage({ ok: true, result });
     } catch (error) {
       parentPort.postMessage({
