@@ -1,8 +1,9 @@
 export let fragmentationOptions = {
-  maxDepth: 3,
+  ionizations: ['esi'],
+  maxDepth: 5,
   limitReactions: 500,
   minIonizations: 1,
   maxIonizations: 1,
   minReactions: 0,
-  maxReactions: 2,
+  maxReactions: 3,
 };

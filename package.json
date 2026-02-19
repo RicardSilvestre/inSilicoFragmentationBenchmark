@@ -25,7 +25,8 @@
     "test-only": "vitest run --coverage",
     "tsc": "npm run clean && npm run tsc-build",
     "tsc-build": "tsc --project tsconfig.build.json",
-    "challenge": "node -e \"import('./src/challenger.js').then(({ default: runChallenger }) => runChallenger({ testMode: false })).catch(err => { console.error(err); process.exit(1); });\""
+    "challenge": "node -e \"import('./src/challenger.js').then(({ default: runChallenger }) => runChallenger({ testMode: false })).catch(err => { console.error(err); process.exit(1); });\"",
+    "challenge-test": "node -e \"import('./src/challenger.js').then(({ default: runChallenger }) => runChallenger({ testMode: true })).catch(err => { console.error(err); process.exit(1); });\""
   },
   "dependencies": {
     "mass-fragmentation": "^1.11.10",
