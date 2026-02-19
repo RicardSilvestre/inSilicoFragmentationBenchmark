@@ -1,8 +1,15 @@
-import fs from 'fs/promises';
-import path from 'path';
-import os from 'os';
-import { Worker, isMainThread, parentPort, workerData } from 'worker_threads';
-import { fileURLToPath } from 'url';
+import { execSync } from 'node:child_process';
+import { existsSync } from 'node:fs';
+import fs from 'node:fs/promises';
+import os from 'node:os';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import {
+  Worker,
+  isMainThread,
+  parentPort,
+  workerData,
+} from 'node:worker_threads';
 
 import fragmentationChallenger from './utils/fragmentationChallenger.js';
 
@@ -10,6 +17,28 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const DATA_DIR = path.join(__dirname, 'data');
+const DATA_ZIP = path.join(__dirname, 'data.zip');
+
+/**
+ * Ensure the data/ directory exists.
+ * If it is missing but data.zip is present, extract it automatically.
+ */
+function ensureData() {
+  if (existsSync(DATA_DIR)) return;
+
+  if (!existsSync(DATA_ZIP)) {
+    throw new Error(
+      `Data directory "${DATA_DIR}" is missing and no data.zip found at "${DATA_ZIP}".\n` +
+        'Please place data.zip next to challenger.js or manually restore the data/ folder.',
+    );
+  }
+
+  console.log('[Challenger] data/ folder not found – extracting data.zip …');
+  execSync(`unzip -q -o "${DATA_ZIP}" -d "${__dirname}"`, {
+    stdio: 'inherit',
+  });
+  console.log('[Challenger] data/ extracted successfully.');
+}
 const CANDIDATES_DIR = path.join(
   DATA_DIR,
   'CASMI2016_Cat2and3_Challenge_Candidates',
@@ -31,7 +60,7 @@ async function fileExists(filePath) {
   try {
     await fs.access(filePath);
     return true;
-  } catch (_) {
+  } catch {
     return false;
   }
 }
@@ -90,6 +119,7 @@ function getConcurrency() {
 if (!isMainThread && workerData) {
   (async () => {
     try {
+      ensureData();
       const fragmentationChallengerModule =
         await import('./utils/fragmentationChallenger.js');
       const fragmentationChallengerFn = fragmentationChallengerModule.default;
@@ -106,6 +136,8 @@ if (!isMainThread && workerData) {
 }
 
 export default async function runChallenger({ testMode = false } = {}) {
+  ensureData();
+
   const allowWrites = !testMode;
   if (allowWrites) {
     await ensureResultsDirs();
@@ -143,17 +175,19 @@ export default async function runChallenger({ testMode = false } = {}) {
   }
 
   if (testMode) {
-    if (grouped.positive.length > 2)
+    if (grouped.positive.length > 2) {
       grouped.positive = grouped.positive.slice(0, 2);
-    if (grouped.negative.length > 2)
+    }
+    if (grouped.negative.length > 2) {
       grouped.negative = grouped.negative.slice(0, 2);
+    }
   }
 
   const aggregatedResults = { positive: [], negative: [] };
 
   function runTaskInWorker(payload) {
     return new Promise((resolve, reject) => {
-      const worker = new Worker(new URL('./challenger.js', import.meta.url), {
+      const worker = new Worker(new URL('challenger.js', import.meta.url), {
         workerData: payload,
         type: 'module',
       });
@@ -167,8 +201,9 @@ export default async function runChallenger({ testMode = false } = {}) {
 
       worker.on('error', reject);
       worker.on('exit', (code) => {
-        if (code !== 0)
+        if (code !== 0) {
           reject(new Error(`Worker stopped with exit code ${code}`));
+        }
       });
     });
   }
